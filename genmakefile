@@ -1,0 +1,27 @@
+#!/usr/bin/perl -w
+
+# makegen : a makefile generator to automate builds for a list of deps
+#
+# Copyright (c) 2025 Charles Suresh <romforth@proton.me>
+# SPDX-License-Identifier: AGPL-3.0-only
+# Please see the LICENSE file for the Affero GPL 3.0 license details
+
+use strict;
+
+print "all : build\n";
+my @acc=();
+while (<>) {
+	/^\s*$/ and next;		# ignore empty lines
+	/^\s*\#/ and next;		# ... and comments
+	chomp;
+	my ($u,$o,$r,$d,$t)=split;
+	my $m="../../$o/$r";
+	push @acc, $m;			# stash it away for the build target
+	print "$m :\n";
+        print "\tgit clone --depth=1 https://$u/$o/$r $m\n";
+	print "\t\$\{MAKE\} -C $m";
+	print "/$d" if ($d);
+	print " $t" if ($t);
+	print "\n";
+}
+print "build : ", join(' ', @acc), "\n";

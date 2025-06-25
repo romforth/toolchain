@@ -1,0 +1,65 @@
+#!/bin/bash
+
+# Copyright (c) 2025 Charles Suresh <romforth@proton.me>
+# SPDX-License-Identifier: AGPL-3.0-only
+# Please see the LICENSE file for the Affero GPL 3.0 license details
+
+# linkbin : symlink binaries into ../bin
+
+# this is just a helper script to symlink all the required binaries in ../bin
+# such that ../bin can then be added to PATH prior to a romforth build
+
+# to override any/all of the links that are created by this script just
+# remove and re-create the symlink in ../bin before/after running this script
+
+set -e
+
+[ -d ../bin ] || mkdir ../bin
+
+# symlink all the binutils binaries that were built by makegen
+for i in ../../romforth/build-binutils/bin/* ; do
+	[ -L ../bin/"$(basename "$i")" ] || {
+		[ -f "$(realpath "$i")" ] && ln -s "$(realpath "$i")" ../bin
+	}
+done
+
+# symlink some of the additional binaries that were built by makegen
+for i in \
+	../../jguillame/retroutils/bin2load/bin2load \
+	../../open-simh/simh/BIN/pdp11 \
+	../../netwide-assembler/nasm/nasm \
+; do
+	[ -e ../bin/"$(basename "$i")" ] || ln -s "$i" ../bin
+done
+
+# symlink sdcc qemu wasmtime - these must be available on the host
+# modify as appropriate
+for i in \
+	/nix/store/ma60fd7zpdrjl67qhdfbv6pz78ig44sh-sdcc-4.2.0/bin/* \
+	/nix/store/wa1c6k3h6ca05a5l98ncwc0mh57mx26p-qemu-8.0.0/bin/qemu-* \
+	/nix/store/6xdipp4s84abqhvy980ac832kdn9apx5-wasmtime-9.0.4/bin/* \
+; do
+	[ -L ../bin/"$(basename "$i")" ] || ln -s "$i" ../bin
+done
+
+# bash, perl, zig and some of the coreutils must be available on the host
+for i in \
+	bash \
+	cat \
+	cmp \
+	cp \
+	cpp \
+	dd \
+	grep \
+	m4 \
+	make \
+	mv \
+	perl \
+	rm \
+	sed \
+	uname \
+	zig \
+; do
+	which "$i" >/dev/null || "$i"	# invoke it to get an error message
+	[ -L ../bin/"$(basename "$i")" ] || ln -s "$(which "$i")" ../bin
+done
