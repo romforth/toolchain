@@ -1,0 +1,14 @@
+# autogen.list : list of git locations and optional build directory and target
+#
+# Copyright (c) 2025 Charles Suresh <romforth@proton.me>
+# SPDX-License-Identifier: AGPL-3.0-only
+# Please see the LICENSE file for the Affero GPL 3.0 license details
+#
+# These can be built by running make at the top level or a sub directory.
+#
+# Note : this is a TSV : one or more tabs separate the values.
+#
+# urlhost	owner			repo	dir(opt:-)	target(opt:-)
+
+github.com	netwide-assembler	nasm
+#github.com	mwenge			asm6809

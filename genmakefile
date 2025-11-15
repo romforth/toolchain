@@ -1,13 +1,19 @@
 #!/usr/bin/perl -w
 
-# makegen : a makefile generator to automate builds for a list of deps
+# makegen : a makefile generator to automate builds for a list of autogen deps
 #
 # Copyright (c) 2025 Charles Suresh <romforth@proton.me>
 # SPDX-License-Identifier: AGPL-3.0-only
 # Please see the LICENSE file for the Affero GPL 3.0 license details
 
+use Getopt::Long;
+
+my $autogen=0;
 use strict;
 
+GetOptions ("autogen" => \$autogen) or die "usage: $0 [-a] tsv";
+
+my $hash={};
 print "all : build\n";
 my @acc=();
 while (<>) {
@@ -15,13 +21,40 @@ while (<>) {
 	/^\s*\#/ and next;		# ... and comments
 	chomp;
 	my ($u,$o,$r,$d,$t)=split;
+	$d='' unless $d;
+	$d='' if $d eq '-';
 	my $m="../../$o/$r";
-	push @acc, $m;			# stash it away for the build target
-	print "$m :\n";
-        print "\tgit clone --depth=1 https://$u/$o/$r $m\n";
-	print "\t\$\{MAKE\} -C $m";
-	print "/$d" if ($d);
-	print " $t" if ($t);
+	my $v=\$hash->{$m};
+	my $vv;
+	my $mkdir=1;
+	if ($vv=$$v) {
+		$mkdir=0;
+	} else {
+		$$v=1;
+	}
+	if ($mkdir) {
+		push @acc, $m;		# stash it away for the build target
+		print "$m :\n";
+		print "\tgit clone --depth=1 https://$u/$o/$r $m\n";
+		if ($autogen) {
+			print "\t(cd $m ; ./autogen.sh)\n";
+			print "\t(cd $m ; ./configure)\n";
+		}
+	}
+	if ($d) {
+		if ($t) {
+			print "$m/$d/$t : $m\n";
+			push @acc, "$m/$d/$t";
+		} else {
+			print "$m/$d : $m\n";
+			push @acc, "$m/$d";
+		}
+		print "\tcd $m/$d ; make";
+		print " $t" if ($t);
+	} else {
+		print "\t\$\{MAKE\} -C $m";
+		print " $t" if ($t);
+	}
 	print "\n";
 }
 print "build : ", join(' ', @acc), "\n";

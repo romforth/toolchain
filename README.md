@@ -3,7 +3,7 @@
 ## To get the source:
 	git clone https://github.com/romforth/toolchain
 
-## To build all of the binaries required to build `romforth`
+## To build ~~all~~ most of the binaries required to build `romforth`
 	make
 
 ## What is this used for?
@@ -32,10 +32,29 @@ make -C ../../$owner/$repo/$dir $target
 ```
 where each of the variables correspond to the column values in `make_list.tsv`
 
-The repos listed in `make_list.tsv` are used to build the following repos:
+The repos listed in `make_list.tsv` are used to build the following binaries:
 - binutils (all architectures that are required for the build)
 - retroutils (used to build bin2load)
-- simh (used to build pdp11)
+- simh (used to build BIN/pdp11, BIN/ibm1130 and Ibm1130/utils/asm1130)
+
+### Builds done via autogen_list.tsv
+
+Source dependencies which need an `autogen` + `configure` step are listed in
+`autogen_list.tsv`. It has the same format requirements as `make_list.tsv`
+which are listed earlier (see previous section regarding `make_list.tsv`)
+
+The repos listed in `autogen_list.tsv` will be downloaded and built using a
+build template that looks something like this:
+```
+git clone https://$url/$owner/$repo ../../$owner/$repo
+cd ../../$owner/$repo ; ./autogen.sh
+cd ../../$owner/$repo ; ./configure
+make -C ../../$owner/$repo/$dir $target
+```
+where each of the variables match the column values in `autogen_list.tsv`
+
+The repos listed in `autogen_list.tsv` are used to build the following binaries:
+- nasm
 
 ### Builds directly done by the `Makefile`
 
@@ -43,7 +62,6 @@ In addition to the repos which can be built by calling `make` the `Makefile`
 takes care of downloading and building the following repos where the build
 is a bit more involved than just running `make`
 - sdcc (which needs `configure ; make`)
-- nasm (which needs `autogen.sh ; configure ; make`)
 
 ### Builds that are currently not done (but may be done in the future)
 

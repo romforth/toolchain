@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 # Please see the LICENSE file for the Affero GPL 3.0 license details
 
-all : ../bin makefile.gen linkbin
+all : ../bin makefile.gen linkbin makeauto.gen
 	./linkbin
 
 ../bin :
@@ -14,16 +14,14 @@ makefile.gen : genmakefile make_list.tsv
 	./genmakefile make_list.tsv > makefile.gen
 	$(MAKE) -f makefile.gen
 
+makeauto.gen : genmakefile autogen_list.tsv
+	./genmakefile -a autogen_list.tsv > makeauto.gen
+	$(MAKE) -f makeauto.gen
+
 ../../swegener/sdcc :
 	git clone --depth=1 https://github.com/swegener/sdcc ../../swegener/sdcc
 	(cd ../../swegener/sdcc ; ./configure --disable-pic14-port --disable-pic16-port)
 	${MAKE} -C ../../swegener/sdcc
 
-../../netwide-assembler/nasm :
-	git clone --depth=1 https://github.com/netwide-assembler/nasm ../../netwide-assembler/nasm
-	(cd ../../netwide-assembler/nasm ; ./autogen.sh)
-	(cd ../../netwide-assembler/nasm ; ./configure)
-	${MAKE} -C ../../netwide-assembler/nasm
-
 clean :
-	rm -rf makefile.gen
+	rm -rf makefile.gen makeauto.gen
