@@ -9,9 +9,13 @@
 use Getopt::Long;
 
 my $autogen=0;
+my $configure=0;
 use strict;
 
-GetOptions ("autogen" => \$autogen) or die "usage: $0 [-a] tsv";
+GetOptions (
+	"autogen" => \$autogen,
+	"configure" => \$configure
+) or die "usage: $0 [-a] [-c] tsv";
 
 my $hash={};
 print "all : build\n";
@@ -38,6 +42,8 @@ while (<>) {
 		print "\tgit clone --depth=1 https://$u/$o/$r $m\n";
 		if ($autogen) {
 			print "\t(cd $m ; ./autogen.sh)\n";
+		}
+		if ($configure) {
 			print "\t(cd $m ; ./configure)\n";
 		}
 	}

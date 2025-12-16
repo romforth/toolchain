@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 # Please see the LICENSE file for the Affero GPL 3.0 license details
 
-all : ../bin makefile.gen linkbin makeauto.gen
+all : ../bin makefile.gen linkbin makeauto.gen makeconf.gen
 	./linkbin
 
 ../bin :
@@ -14,8 +14,12 @@ makefile.gen : genmakefile make_list.tsv
 	./genmakefile make_list.tsv > makefile.gen
 	$(MAKE) -f makefile.gen
 
+makeconf.gen : genmakefile configure_list.tsv
+	./genmakefile -c configure_list.tsv > makeconf.gen
+	$(MAKE) -f makeconf.gen
+
 makeauto.gen : genmakefile autogen_list.tsv
-	./genmakefile -a autogen_list.tsv > makeauto.gen
+	./genmakefile -a -c autogen_list.tsv > makeauto.gen
 	$(MAKE) -f makeauto.gen
 
 ../../swegener/sdcc :
@@ -24,4 +28,4 @@ makeauto.gen : genmakefile autogen_list.tsv
 	${MAKE} -C ../../swegener/sdcc
 
 clean :
-	rm -rf makefile.gen makeauto.gen
+	rm -rf makefile.gen makeauto.gen makeconf.gen
