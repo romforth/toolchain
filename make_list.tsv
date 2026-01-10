@@ -10,9 +10,9 @@
 #
 # urlhost	owner		repo		dir(opt:-)	target(opt:-)
 
-github.com	open-simh	simh		-		BIN/pdp11
-github.com	open-simh	simh		-		BIN/ibm1130
-github.com	open-simh	simh		Ibm1130/utils	asm1130
+github.com	romforth	simh		-		BIN/pdp11
+github.com	romforth	simh		-		BIN/ibm1130
+github.com	romforth	simh		Ibm1130/utils	asm1130
 github.com	jguillaumes	retroutils	bin2load
 github.com	romforth	build-binutils
 github.com	romforth	mspdebug
